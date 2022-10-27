@@ -5,7 +5,7 @@
  * @author Jesus Daniel Revas Nuño
  * @author Eduardo Angeles Guerrero
  * 
- * @brief Entregabke de actividad integradora 2
+ * @brief Entregable de actividad integradora 2
  * 
  * @version 0.1
  * @date 2022-10-25
@@ -16,17 +16,9 @@
 
 #include <iostream>
 #include <vector>
+#include <limits>
+#include <cmath>
 using namespace std;
-
-/**
- * @brief Funcion para obtener la matriz de entrada.
- * 
- * @param filename Nombre de archivo de texto de la matriz de adyacencia.
- * @return vector<vector<int>> mat
- */
-vector<vector<int>> getMatrix (string filename) {
-
-}
 
 /**
  * @brief Punto 1 - Cableado optimo de las colonias
@@ -97,6 +89,111 @@ class Solution_1 {
  * @brief Punto 4 - Nueva contratación optima
  * Se uso [...]
  */
+class Line {
+    public:
+    bool vertical = false;
+    double m, b, x;
+    pair<int,int>* left = nullptr;
+    pair<int,int>* right = nullptr;
+
+    Line(int m, int b) {
+        this->m = m;
+        this->b = b;
+    }
+
+    Line(double x) {
+        vertical = true;
+        this->x = x;
+    }
+};
+
+class Point {
+    public:
+    double x, y;
+    vector<Line*> lineas;
+    
+    Point(pair<int,int> coord) {
+        this->x = coord.first;
+        this->y = coord.second;
+    }
+
+    void addLine(Line* linea) {
+        lineas.push_back(linea);
+    }
+};
+
+class Solution_4_Voronoi{
+    private:
+
+    public:
+    void solution (vector<pair<double,double>> coordenadas) {
+        // Convirtiendo input a formato de puntos
+        vector<Point> puntos;
+        for (pair<double,double> coord : coordenadas) {
+            puntos.push_back(Point(coord));
+        }
+
+        // Obteniendo las lineas de mediatriz entre los puntos
+        for (int p1 = 0; p1 < puntos.size()-1; p1++) {
+            for (int p2 = p1 + 1; p2 < puntos.size(); p2++) {
+
+                double x_mid = (puntos[p1].x + puntos[p2].x) / 2;
+                double y_mid = (puntos[p1].y + puntos[p2].y) / 2;
+
+                double delta_y = puntos[p2].y - puntos[p1].y;
+                double delta_x = puntos[p2].x - puntos[p1].x;
+
+                // m = delta_y / delta_x => m_inv = -1/m
+                if (delta_y != 0) {
+                    double m_inv = -delta_x / delta_y;
+                    double b = y_mid - m_inv * x_mid;
+
+                    cout << "Linea entre ";
+                    cout << "(" << puntos[p1].x << "," << puntos[p1].y << ")";
+                    cout << " y ";
+                    cout << "(" << puntos[p2].x << "," << puntos[p2].y << ")";
+                    cout << "\n";
+                    cout << "y = " << m_inv << "x + " << b << "\n";
+
+                    Line l = Line(m_inv, b);
+
+                    puntos[p1].addLine(&l);
+                    puntos[p2].addLine(&l);
+                }
+                else {
+                    cout << "Linea entre " << "\n";
+                    cout << "x = " << x_mid << "\n";
+
+                    Line l = Line(x_mid);
+
+                    puntos[p1].addLine(&l);
+                    puntos[p2].addLine(&l);
+                }
+            }
+        }
+
+    }    
+};
+
+class Solution_4_connection{
+    // Given a set of points and a point x, find minimum distance between x and points in the set.
+    private:
+    public:
+        void minDistance(vector<Point> puntos, Point x) {
+            double min_dist = INT_MAX;
+            Point min_point = puntos[0];
+            for (Point p : puntos) {
+                double dist = sqrt(pow(p.x - x.x, 2) + pow(p.y - x.y, 2));
+                if (dist < min_dist) {
+                    min_point = p;
+                    min_dist = dist;
+                }
+            }
+            
+            // print points and minimum distance
+            cout << "El punto (" << x.x << "," << x.y << ") esta a una distancia minima de " << min_dist << " del punto: " << min_point.x << "," << min_point.y << "\n";
+        }
+};
 
 int main(int argc, char const *argv[])
 {
@@ -118,6 +215,38 @@ int main(int argc, char const *argv[])
 
     cout << "\n" << "PROBLEMA 1" << "\n";
     Solution_1 result; result.solution(adyacencia_colonias);
+
+    cout << "\n" << "PROBLEMA 2" << "\n";
+
+    cout << "\n" << "PROBLEMA 3" << "\n";
+
+    cout << "\n" << "PROBLEMA 4 : CERCANIA A CENTRALES ELECTRICAS" << "\n";
+    vector<pair<double,double>> coordenadas;
+    string input_x, input_y;
+    for (int i = 0; i < n; i++) {
+        while (true)
+        {
+            cout << "Coordenada de Central " << i + 1 << " [x y]: ";
+            cin >> input_x >> input_y;
+            try
+            {
+                double x = stod(input_x);
+                double y = stod(input_y);
+                coordenadas.push_back(pair<double,double>(x,y));
+                break;
+            }
+            catch(const std::exception& e)
+            {
+                cout << "Formato incorrecto. Ingrese un numero valido." << '\n';
+                //something went wrong, we reset the buffer's state to good
+                cin.clear();
+                //and empty it
+                cin.ignore(numeric_limits<streamsize>::max(),'\n');
+            }
+        }
+    }
+
+    Solution_4_Voronoi a; a.solution(coordenadas);
 
     return 0;
 }
