@@ -26,8 +26,26 @@ bool bfs(vector<vector<int>> &residualGraph, int source, int sink, vector<int> &
     return (visited[sink] == true);
 }
 
+// In a adjacency matrix, check if there are negative values. If there are turn them to cero and add the value to its mirror as abs(value)
+vector<vector<int>> treatGraph(vector<vector<int>> graph){
+    vector<vector<int>> newGraph = graph;
+    for(int i = 0; i < graph.size(); i++){
+        for(int j = 0; j < graph.size(); j++){
+            if(graph[i][j] < 0){
+                newGraph[i][j] = 0;
+                newGraph[j][i] += abs(graph[i][j]);
+            }
+        }
+    }
+    return newGraph;
+
+}
+
 
 int fordFulkerson(vector<vector<int>> graph, int origen, int destino){
+
+    graph = treatGraph(graph);
+
     int n = graph.size();
     vector<vector<int>> residualGraph(n, vector<int>(n, 0));
     for(int i = 0; i < n; i++){
