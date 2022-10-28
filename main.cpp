@@ -1,9 +1,9 @@
 /**
  * @file main.cpp
  * 
- * @author Abraham Chalita Nuñez
- * @author Jesus Daniel Revas Nuño
- * @author Eduardo Angeles Guerrero
+ * @author Abraham Chalita Nuñez        A0165
+ * @author Jesus Daniel Revas Nuño      A0165
+ * @author Eduardo Angeles Guerrero     A0165
  * 
  * @brief Entregable de actividad integradora 2
  * 
@@ -18,6 +18,7 @@
 #include <vector>
 #include <limits>
 #include <cmath>
+#include <fstream>
 using namespace std;
 
 /**
@@ -80,11 +81,13 @@ class Solution_1 {
  * @brief Punto 2 - Ruta optima de visita
  * Se uso [...]
  */
+ #include "travelSM.h"
 
 /**
  * @brief Punto 3 - Flujo maximo de informacion
  * Se uso [...]
  */
+#include "flow.h"
 
 /**
  * @brief Punto 4 - Nueva contratación optima
@@ -218,33 +221,194 @@ int get_int (string message)
 
 int main(int argc, char const *argv[])
 {
-    cout << "¿Cuantas colonias hay?" << "\n";
-    int n;   // Numero de colonias
-    cout << "N: "; cin >> n; cout << "\n"; 
+    cout << "###########################\n";
+    cout << "# ACTIVIDAD INTEGRADORA 2 #\n";
+    cout << "###########################\n\n";
 
-    vector<vector<int>> adyacencia_colonias = vector<vector<int>>(n, vector<int>(n));
-
-    for (int col = 0; col < n; col++)
+    // Leyendo archivo de entrada.
+    bool correct_file, empty_file, proceed_1, proceed_2, proceed_3;
+    ifstream file;
+    string current_line;
+    try
     {
-        cout << "Introduzca adyacencias de colonia " << col + 1 << ": ";
-        for (int i = 0; i < n; i++)
+        file.open("test.txt");
+        empty_file = file.peek() == ifstream::traits_type::eof();
+        correct_file = true; proceed_1 = true; proceed_2 = true; proceed_3 = true;
+    }
+    catch(const std::exception& e)
+    {
+        correct_file = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
+        cout << "ERROR: El archivo test.txt no se reconoce en el directorio actual.\n\n";
+    }
+
+    if (empty_file)
+    {
+        correct_file = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
+        cout << "ERROR: El archivo test.txt esta vacio.\n\n";
+    }
+
+    int n;
+    if (correct_file)
+    {
+        try
         {
-            // TODO: Verificaciones de inputs
-            int dist;
-            cin >> dist;
-            adyacencia_colonias[col][i] = dist;
+            getline(file, current_line);
+            n = stoi(current_line);
+            cout << "No. Lineas: " << n << "\n";
+        }
+        catch(const std::exception& e)
+        {
+            correct_file = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
+            cout << "ERROR: La primera linea del archivo no pudo convertirse en un numero entero.\n";
+            cout << "       Por favor, verifique el archivo de entrada.\n\n";
         }
     }
 
-    cout << "\n" << "PROBLEMA 1" << "\n";
-    Solution_1 result; result.solution(adyacencia_colonias);
-    dijkstra_result(adyacencia_colonias);
+    vector<vector<int>> adyacencia_colonias = vector<vector<int>>(n, vector<int>(n));
+    cout << "LEYENDO MATRIZ DE ADYACENCIA\n\n";
+    if (correct_file) {
+        string input;
+        bool proceed = true;
+        try
+        {
+            for (int i = 0; i < n; i++)
+            {
+                if (file.peek() == ifstream::traits_type::eof()) throw exception();
+                getline(file, current_line);
+                if (!proceed) break;
+                for (int j = 0; j < n; j++)
+                {
+                    file >> input;
+                    cout << input << " ";
+                    try
+                    {
+                        adyacencia_colonias[i][j] = stoi(input);
+                        if (i == j && adyacencia_colonias[i][j] != 0) {
+                            cout << "ERROR: En la matriz de adyacencia un nodo no puede conectarse con si mismo.\n";
+                            cout << "       El valor debe ser 0 en la diagonal. Por favor verifique el archivo.\n\n";
+                            correct_file = false; proceed = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
+                            break;
+                        }
+                        else if (adyacencia_colonias[i][j] < 0) {
+                            cout << "ERROR: Un valor en la matriz de adyacencia es negativo.\n";
+                            cout << "       Por favor verifique el archivo.\n\n";
+                            correct_file = false; proceed = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
+                            break;
+                        }
+                    }
+                    catch(const std::exception& e)
+                    {
+                        cout << "ERROR: Un valor en la matriz de adyacencia no se puede interpretar como numero entero.\n\n";
+                        correct_file = false; proceed = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
+                        break;
+                    }
+                }
+                cout << "\n";
+            }
+        }
+        catch(const std::exception& e)
+        {
+            cout << "ERROR: El archivo se acabo antes de realizar las lecturas.\n";
+            cout << "       Por favor asegurese que el archivo este completo.\n\n";
+            correct_file = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
+        }
+    }
+    
+    vector<vector<int>> flujo_colonias = vector<vector<int>>(n, vector<int>(n));
+    cout << "LEYENDO MATRIZ DE FLUJO\n\n";
+    if (correct_file) {
+        string input;
+        bool proceed = true;
+        try
+        {
+            for (int i = 0; i < n; i++)
+            {
+                if (file.peek() == ifstream::traits_type::eof()) throw exception();
+                getline(file, current_line);
+                if (!proceed) break;
+                for (int j = 0; j < n; j++)
+                {
+                    file >> input;
+                    cout << input << " ";
+                    try
+                    {
+                        flujo_colonias[i][j] = stoi(input);
+                        if (i == j && flujo_colonias[i][j] != 0) {
+                            cout << "ERROR: En la matriz de flujo un nodo no puede tener flujo a si mismo.\n";
+                            cout << "       El valor debe ser 0 en la diagonal. Por favor verifique el archivo.\n\n";
+                            correct_file = false; proceed = false; proceed_3 = false;
+                            break;
+                        }
+                        else if (flujo_colonias[i][j] != 0 && adyacencia_colonias[i][j] == 0) {
+                            cout << "ERROR: No puede existir flujo cuando no estan conectadas las colonias.\n";
+                            cout << "       Por favor verifique el archivo.\n\n";
+                            correct_file = false; proceed = false; proceed_3 = false;
+                            break;
+                        }
+                    }
+                    catch(const std::exception& e)
+                    {
+                        cout << "ERROR: Un valor en la matriz de adyacencia no se puede interpretar como numero entero.\n\n";
+                        correct_file = false; proceed = false; proceed_3 = false;
+                        break;
+                    }
+                }
+                cout << "\n";
+            }
+        }
+        catch(const std::exception& e)
+        {
+            cout << "ERROR: El archivo se acabo antes de realizar las lecturas.\n";
+            cout << "       Por favor asegurese que el archivo este completo.\n\n";
+            correct_file = false; proceed_3 = false;
+        }
+    }
 
-    cout << "\n" << "PROBLEMA 2" << "\n";
+    cout << "\n";
+    cout << "#####################################\n";
+    cout << "# PROBLEMA 1: CONEXIONES EFICIENTES #\n";
+    cout << "#####################################\n\n";
+    if (proceed_1)
+    {
+        dijkstra_result(adyacencia_colonias);
+    }
+    else
+    {
+        cout << "No se puede realizar el problema 1 por falla de input\n";
+    }
 
-    cout << "\n" << "PROBLEMA 3" << "\n";
+    cout << "\n";
+    cout << "################################\n";
+    cout << "# PROBLEMA 2: VIAJERO VENDEDOR #\n";
+    cout << "################################\n\n";
 
-    cout << "\n" << "PROBLEMA 4 : CERCANIA A CENTRALES ELECTRICAS" << "\n\n";
+    if (proceed_2)
+    {
+        salesman(adyacencia_colonias, 0);
+    }
+    else
+    {
+        cout << "No se puede realizar el problema 3 por falla de input\n";
+    }
+
+    cout << "\n";
+    cout << "###########################################\n";
+    cout << "# PROBLEMA 3: MAXIMO FLUJO DE INFORMACION #\n";
+    cout << "###########################################\n\n";
+
+    if (proceed_3)
+    {
+        cout << "Resultado\n";
+    }
+    else
+    {
+        cout << "No se puede realizar el problema 3 por falla de input\n";
+    }
+
+    cout << "\n";
+    cout << "################################################\n";
+    cout << "# PROBLEMA 4 : CERCANIA A CENTRALES ELECTRICAS #\n";
+    cout << "################################################\n\n";
 
     int n_centrales, n_nuevas_contrataciones;
     vector<Point> centrales, contrataciones;
@@ -256,10 +420,12 @@ int main(int argc, char const *argv[])
         {
             cout << "¿Cuantas centrales elécticas existen? "; 
             cin >> n_centrales;
-            if (n_centrales <= 0) {
+            if (n_centrales <= 0) 
+            {
                 cout << "ERROR: Introduzca un numero mayor a cero." << "\n\n";
             }
-            else {
+            else 
+            {
                 break;
             }
         }
@@ -297,10 +463,12 @@ int main(int argc, char const *argv[])
         {
             cout << "¿Cuantas nuevas contrataciones quiere? "; 
             cin >> n_nuevas_contrataciones;
-            if (n_nuevas_contrataciones <= 0) {
+            if (n_nuevas_contrataciones <= 0)
+            {
                 cout << "ERROR: Introduzca un numero mayor a cero." << "\n\n";
             }
-            else {
+            else 
+            {
                 break;
             }
         }
@@ -334,7 +502,6 @@ int main(int argc, char const *argv[])
 
     // Solution_4_Voronoi a; a.solution(coordenadas);
     Solution_4_connection b;
-
     for (Point nuevo : contrataciones)
     {
         b.minDistance(centrales, nuevo);

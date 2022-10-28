@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <functional>
 
-
+//Edus
 using namespace std;
 
 struct path{
@@ -108,10 +108,15 @@ void salesman(vector<vector<int>> graph, int s){
     for(int i = 0; i < paths.size(); i++){
         if(paths[i].cost < costo && checkIfvalidPath(paths[i].camino, graph, s, paths[i].cost)){
             costo = paths[i].cost;
-            mejorCamino = paths[i].camino;
+            selected = paths[i].camino;
         }
     }
 
-    printPath(mejorCamino, s, costo);
+    if(selected.size() == 0){
+        cout << "No valid path found" << endl;
+        return;
+    }
+
+    printPath(selected, s, costo);
 
 }
