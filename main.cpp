@@ -74,6 +74,7 @@ class Solution_1 {
         prim_algo(matrix, n, 0, visited_nodes);                 // O(n^2)
     }
 };
+#include "dijkstra.h"
 
 /**
  * @brief Punto 2 - Ruta optima de visita
@@ -112,7 +113,7 @@ class Point {
     double x, y;
     vector<Line*> lineas;
     
-    Point(pair<int,int> coord) {
+    Point(pair<double,double> coord) {
         this->x = coord.first;
         this->y = coord.second;
     }
@@ -195,6 +196,26 @@ class Solution_4_connection{
         }
 };
 
+int get_int (string message)
+{
+    double res;
+    while (true)
+    {
+        cout << message << ": ";
+        try
+        {
+            cin >> res;
+            if (res <= 0) {
+                cout << "ERROR: Introduzca un numero positivo." << "\n";
+            }
+        }
+        catch(const std::exception& e)
+        {
+            cout << "ERROR: Introduzca un numero vali." << "\n";
+        }
+    }
+}
+
 int main(int argc, char const *argv[])
 {
     cout << "¿Cuantas colonias hay?" << "\n";
@@ -203,9 +224,11 @@ int main(int argc, char const *argv[])
 
     vector<vector<int>> adyacencia_colonias = vector<vector<int>>(n, vector<int>(n));
 
-    for (int col = 0; col < n; col++) {
+    for (int col = 0; col < n; col++)
+    {
         cout << "Introduzca adyacencias de colonia " << col + 1 << ": ";
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++)
+        {
             // TODO: Verificaciones de inputs
             int dist;
             cin >> dist;
@@ -215,38 +238,107 @@ int main(int argc, char const *argv[])
 
     cout << "\n" << "PROBLEMA 1" << "\n";
     Solution_1 result; result.solution(adyacencia_colonias);
+    dijkstra_result(adyacencia_colonias);
 
     cout << "\n" << "PROBLEMA 2" << "\n";
 
     cout << "\n" << "PROBLEMA 3" << "\n";
 
-    cout << "\n" << "PROBLEMA 4 : CERCANIA A CENTRALES ELECTRICAS" << "\n";
-    vector<pair<double,double>> coordenadas;
-    string input_x, input_y;
-    for (int i = 0; i < n; i++) {
+    cout << "\n" << "PROBLEMA 4 : CERCANIA A CENTRALES ELECTRICAS" << "\n\n";
+
+    int n_centrales, n_nuevas_contrataciones;
+    vector<Point> centrales, contrataciones;
+    double x, y;
+
+    while (true)
+    {
+        try
+        {
+            cout << "¿Cuantas centrales elécticas existen? "; 
+            cin >> n_centrales;
+            if (n_centrales <= 0) {
+                cout << "ERROR: Introduzca un numero mayor a cero." << "\n\n";
+            }
+            else {
+                break;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            cout << "ERROR: Error en conversion de entrada a input. Por favor introduzca un numero." << "\n\n";
+        }
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(),'\n');
+    }
+
+    for (int i = 0; i < n_centrales; i++)
+    {
         while (true)
         {
             cout << "Coordenada de Central " << i + 1 << " [x y]: ";
-            cin >> input_x >> input_y;
             try
             {
-                double x = stod(input_x);
-                double y = stod(input_y);
-                coordenadas.push_back(pair<double,double>(x,y));
+                cin >> x >> y;
+                centrales.push_back(Point(pair<double,double>(x,y)));
                 break;
             }
             catch(const std::exception& e)
             {
-                cout << "Formato incorrecto. Ingrese un numero valido." << '\n';
-                //something went wrong, we reset the buffer's state to good
-                cin.clear();
-                //and empty it
-                cin.ignore(numeric_limits<streamsize>::max(),'\n');
+                cout << "Formato incorrecto. Ingrese un par de numeros validos." << '\n';
             }
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(),'\n');
         }
     }
 
-    Solution_4_Voronoi a; a.solution(coordenadas);
+    while (true)
+    {
+        try
+        {
+            cout << "¿Cuantas nuevas contrataciones quiere? "; 
+            cin >> n_nuevas_contrataciones;
+            if (n_nuevas_contrataciones <= 0) {
+                cout << "ERROR: Introduzca un numero mayor a cero." << "\n\n";
+            }
+            else {
+                break;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            cout << "ERROR: Error en conversion de entrada a input. Por favor introduzca un numero" << "\n\n";
+        }
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(),'\n');
+    }
+
+    for (int i = 0; i < n_nuevas_contrataciones; i++)
+    {
+        while (true)
+        {
+            cout << "Coordenada de Central " << i + 1 << " [x y]: ";
+            try
+            {
+                cin >> x >> y;
+                contrataciones.push_back(Point(pair<double,double>(x,y)));
+                break;
+            }
+            catch(const std::exception& e)
+            {
+                cout << "Formato incorrecto. Ingrese un par de numeros validos." << '\n';
+            }
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(),'\n');
+        }
+    }
+
+    // Solution_4_Voronoi a; a.solution(coordenadas);
+    Solution_4_connection b;
+
+    for (Point nuevo : contrataciones)
+    {
+        b.minDistance(centrales, nuevo);
+    }
 
     return 0;
 }
