@@ -7,14 +7,14 @@ using namespace std;
 using namespace std;
 
 struct node {
-    vector<pair<double,node*>> edges;
+    vector<pair<int,node*>> edges;
     string name;
     bool visited;
     node* prev;
-    double weight = 0;
+    int weight = 0;
 
-    void goes_to(double dist, node b) {
-        edges.push_back(pair<double,node*>(dist, &b));
+    void goes_to(int dist, node b) {
+        edges.push_back(pair<int,node*>(dist, &b));
     }
 };
 
@@ -31,8 +31,8 @@ void result (node end) {
     cout << traverse.name << "\n";
 }
 
-void add_edge (node &a, node &b, double dist) {
-    a.edges.push_back(pair<double,node*>(dist, &b));
+void add_edge (node &a, node &b, int dist) {
+    a.edges.push_back(pair<int,node*>(dist, &b));
 }
 
 void dijkstra (node* begin, node* end) { //O(nlog(m)): n is the number of nodes / m is the number of edges
@@ -42,9 +42,9 @@ void dijkstra (node* begin, node* end) { //O(nlog(m)): n is the number of nodes 
     }
 
     vector<node*> candidates;
-    for (pair<double,node*> next : begin->edges) {
+    for (pair<int,node*> next : begin->edges) {
         if (!next.second->visited) {
-            double cumulative_weight = next.first + begin->weight;
+            int cumulative_weight = next.first + begin->weight;
             if (next.second->weight == 0) { // Node has not been asinged a weight
                 next.second->weight = cumulative_weight;
                 next.second->prev = begin;
@@ -65,8 +65,7 @@ void dijkstra (node* begin, node* end) { //O(nlog(m)): n is the number of nodes 
     }
 }
 
-// Cambiado a double
-void dijkstra_result (vector<vector<double>> adyacency_matrix) {
+void dijkstra_result (vector<vector<int>> adyacency_matrix) {
     int length = adyacency_matrix.size();
     for (int node_begin = 0; node_begin < length; node_begin++) {
         for (int node_end = 0; node_end < length; node_end++) {

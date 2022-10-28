@@ -8,11 +8,11 @@
 using namespace std;
 
 struct path{
-    int cost;
+    double cost;
     vector<int> camino;
 };
 
-void printPath(vector<int> mejorCamino, int s, int currLength){
+void printPath(vector<int> mejorCamino, int s, double currLength){
     cout << "Shortest path: " << s << " ---> ";
 
     string delim = "";
@@ -26,7 +26,7 @@ void printPath(vector<int> mejorCamino, int s, int currLength){
     cout << endl;
 }
 
-bool checkIfvalidPath(vector<int> camino, vector<vector<int>> graph, int s, int currLength){
+bool checkIfvalidPath(vector<int> camino, vector<vector<double>> graph, int s, double currLength){
 
 
 
@@ -53,7 +53,7 @@ bool checkIfvalidPath(vector<int> camino, vector<vector<int>> graph, int s, int 
 }
 
 
-void salesman(vector<vector<int>> graph, int s){
+void salesman(vector<vector<double>> graph, int s){
 
     int n = graph.size();
     vector<int> vertex, mejorCamino, selected;
@@ -66,13 +66,13 @@ void salesman(vector<vector<int>> graph, int s){
         }
     }
     
-    int costo = INT_MAX;
+    double costo = INT_MAX;
 
     while(next_permutation(vertex.begin(), vertex.end())){
 
         mejorCamino.clear();
 
-        int currLength = 0;
+        double currLength = 0;
 
         int value = s;
         for(int i = 0; i < vertex.size(); i++){

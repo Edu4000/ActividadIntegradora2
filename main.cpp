@@ -186,16 +186,20 @@ class Solution_4_connection{
         void minDistance(vector<Point> puntos, Point x) {
             double min_dist = INT_MAX;
             Point min_point = puntos[0];
+            int num = 1;
+            int min_num = 1;
             for (Point p : puntos) {
                 double dist = sqrt(pow(p.x - x.x, 2) + pow(p.y - x.y, 2));
                 if (dist < min_dist) {
                     min_point = p;
                     min_dist = dist;
+                    min_num = num;
                 }
+                num++;
             }
             
             // print points and minimum distance
-            cout << "El punto (" << x.x << "," << x.y << ") esta a una distancia minima de " << min_dist << " del punto: " << min_point.x << "," << min_point.y << "\n";
+            cout << " (" << x.x << "," << x.y << ") esta mas cerca de la Central " << min_num << " (" << min_point.x  << "," << min_point.y << ")" << " a una distancia minima de " << min_dist << " km\n";
         }
 };
 
@@ -209,12 +213,12 @@ int get_int (string message)
         {
             cin >> res;
             if (res <= 0) {
-                cout << "ERROR: Introduzca un numero positivo." << "\n";
+                cout << "\nERROR: Introduzca un numero positivo." << "\n";
             }
         }
         catch(const std::exception& e)
         {
-            cout << "ERROR: Introduzca un numero vali." << "\n";
+            cout << "\nERROR: Introduzca un numero vali." << "\n";
         }
     }
 }
@@ -238,13 +242,13 @@ int main(int argc, char const *argv[])
     catch(const std::exception& e)
     {
         correct_file = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
-        cout << "ERROR: El archivo test.txt no se reconoce en el directorio actual.\n\n";
+        cout << "\nERROR: El archivo test.txt no se reconoce en el directorio actual.\n\n";
     }
 
     if (empty_file)
     {
         correct_file = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
-        cout << "ERROR: El archivo test.txt esta vacio.\n\n";
+        cout << "\nERROR: El archivo test.txt esta vacio.\n\n";
     }
 
     int n;
@@ -259,12 +263,12 @@ int main(int argc, char const *argv[])
         catch(const std::exception& e)
         {
             correct_file = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
-            cout << "ERROR: La primera linea del archivo no pudo convertirse en un numero entero.\n";
+            cout << "\nERROR: La primera linea del archivo no pudo convertirse en un numero entero.\n";
             cout << "       Por favor, verifique el archivo de entrada.\n\n";
         }
     }
 
-    vector<vector<int>> adyacencia_colonias = vector<vector<int>>(n, vector<int>(n));
+    vector<vector<double>> adyacencia_colonias = vector<vector<double>>(n, vector<double>(n));
     cout << "LEYENDO MATRIZ DE ADYACENCIA\n\n";
     if (correct_file) {
         string input;
@@ -282,15 +286,15 @@ int main(int argc, char const *argv[])
                     cout << input << " ";
                     try
                     {
-                        adyacencia_colonias[i][j] = stoi(input);
+                        adyacencia_colonias[i][j] = stod(input);
                         if (i == j && adyacencia_colonias[i][j] != 0) {
-                            cout << "ERROR: En la matriz de adyacencia un nodo no puede conectarse con si mismo.\n";
+                            cout << "\nERROR: En la matriz de adyacencia un nodo no puede conectarse con si mismo.\n";
                             cout << "       El valor debe ser 0 en la diagonal. Por favor verifique el archivo.\n\n";
                             correct_file = false; proceed = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
                             break;
                         }
                         else if (adyacencia_colonias[i][j] < 0) {
-                            cout << "ERROR: Un valor en la matriz de adyacencia es negativo.\n";
+                            cout << "\nERROR: Un valor en la matriz de adyacencia es negativo.\n";
                             cout << "       Por favor verifique el archivo.\n\n";
                             correct_file = false; proceed = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
                             break;
@@ -298,7 +302,7 @@ int main(int argc, char const *argv[])
                     }
                     catch(const std::exception& e)
                     {
-                        cout << "ERROR: Un valor en la matriz de adyacencia no se puede interpretar como numero entero.\n\n";
+                        cout << "\nERROR: Un valor en la matriz de adyacencia no se puede interpretar como numero entero.\n\n";
                         correct_file = false; proceed = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
                         break;
                     }
@@ -308,13 +312,13 @@ int main(int argc, char const *argv[])
         }
         catch(const std::exception& e)
         {
-            cout << "ERROR: El archivo se acabo antes de realizar las lecturas.\n";
+            cout << "\nERROR: El archivo se acabo antes de realizar las lecturas.\n";
             cout << "       Por favor asegurese que el archivo este completo.\n\n";
             correct_file = false; proceed_1 = false; proceed_2 = false; proceed_3 = false;
         }
     }
     
-    vector<vector<int>> flujo_colonias = vector<vector<int>>(n, vector<int>(n));
+    vector<vector<double>> flujo_colonias = vector<vector<double>>(n, vector<double>(n));
     cout << "LEYENDO MATRIZ DE FLUJO\n\n";
     if (correct_file) {
         string input;
@@ -332,15 +336,15 @@ int main(int argc, char const *argv[])
                     cout << input << " ";
                     try
                     {
-                        flujo_colonias[i][j] = stoi(input);
+                        flujo_colonias[i][j] = stod(input);
                         if (i == j && flujo_colonias[i][j] != 0) {
-                            cout << "ERROR: En la matriz de flujo un nodo no puede tener flujo a si mismo.\n";
+                            cout << "\nERROR: En la matriz de flujo un nodo no puede tener flujo a si mismo.\n";
                             cout << "       El valor debe ser 0 en la diagonal. Por favor verifique el archivo.\n\n";
                             correct_file = false; proceed = false; proceed_3 = false;
                             break;
                         }
                         else if (flujo_colonias[i][j] != 0 && adyacencia_colonias[i][j] == 0) {
-                            cout << "ERROR: No puede existir flujo cuando no estan conectadas las colonias.\n";
+                            cout << "\nERROR: No puede existir flujo cuando no estan conectadas las colonias.\n";
                             cout << "       Por favor verifique el archivo.\n\n";
                             correct_file = false; proceed = false; proceed_3 = false;
                             break;
@@ -348,7 +352,7 @@ int main(int argc, char const *argv[])
                     }
                     catch(const std::exception& e)
                     {
-                        cout << "ERROR: Un valor en la matriz de adyacencia no se puede interpretar como numero entero.\n\n";
+                        cout << "\nERROR: Un valor en la matriz de adyacencia no se puede interpretar como numero entero.\n\n";
                         correct_file = false; proceed = false; proceed_3 = false;
                         break;
                     }
@@ -358,7 +362,7 @@ int main(int argc, char const *argv[])
         }
         catch(const std::exception& e)
         {
-            cout << "ERROR: El archivo se acabo antes de realizar las lecturas.\n";
+            cout << "\nERROR: El archivo se acabo antes de realizar las lecturas.\n";
             cout << "       Por favor asegurese que el archivo este completo.\n\n";
             correct_file = false; proceed_3 = false;
         }
@@ -388,7 +392,7 @@ int main(int argc, char const *argv[])
     }
     else
     {
-        cout << "No se puede realizar el problema 3 por falla de input\n";
+        cout << "No se puede realizar el problema 2 por falla de input\n";
     }
 
     cout << "\n";
@@ -399,6 +403,8 @@ int main(int argc, char const *argv[])
     if (proceed_3)
     {
         cout << "Resultado\n";
+        cout << "El flujo máximo posible entre inicio y fin es: " << fordFulkerson(flujo_colonias, 0, flujo_colonias.size()-1) << endl;
+
     }
     else
     {
@@ -413,16 +419,18 @@ int main(int argc, char const *argv[])
     int n_centrales, n_nuevas_contrataciones;
     vector<Point> centrales, contrataciones;
     double x, y;
+    string input;
 
     while (true)
     {
         try
         {
             cout << "¿Cuantas centrales elécticas existen? "; 
-            cin >> n_centrales;
+            cin >> input;
+            n_centrales = stod(input);
             if (n_centrales <= 0) 
             {
-                cout << "ERROR: Introduzca un numero mayor a cero." << "\n\n";
+                cout << "\nERROR: Introduzca un numero mayor a cero." << "\n\n";
             }
             else 
             {
@@ -431,7 +439,7 @@ int main(int argc, char const *argv[])
         }
         catch(const std::exception& e)
         {
-            cout << "ERROR: Error en conversion de entrada a input. Por favor introduzca un numero." << "\n\n";
+            cout << "\nERROR: Error en conversion de entrada a input. Por favor introduzca un numero." << "\n\n";
         }
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(),'\n');
@@ -444,7 +452,10 @@ int main(int argc, char const *argv[])
             cout << "Coordenada de Central " << i + 1 << " [x y]: ";
             try
             {
-                cin >> x >> y;
+                cin >> input;
+                x = stod(input);
+                cin >> input;
+                y = stod(input);
                 centrales.push_back(Point(pair<double,double>(x,y)));
                 break;
             }
@@ -462,10 +473,11 @@ int main(int argc, char const *argv[])
         try
         {
             cout << "¿Cuantas nuevas contrataciones quiere? "; 
-            cin >> n_nuevas_contrataciones;
+            cin >> input;
+            n_nuevas_contrataciones = stod(input);
             if (n_nuevas_contrataciones <= 0)
             {
-                cout << "ERROR: Introduzca un numero mayor a cero." << "\n\n";
+                cout << "\nERROR: Introduzca un numero mayor a cero." << "\n\n";
             }
             else 
             {
@@ -474,7 +486,7 @@ int main(int argc, char const *argv[])
         }
         catch(const std::exception& e)
         {
-            cout << "ERROR: Error en conversion de entrada a input. Por favor introduzca un numero" << "\n\n";
+            cout << "\nERROR: Error en conversion de entrada a input. Por favor introduzca un numero" << "\n\n";
         }
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(),'\n');
@@ -484,10 +496,13 @@ int main(int argc, char const *argv[])
     {
         while (true)
         {
-            cout << "Coordenada de Central " << i + 1 << " [x y]: ";
+            cout << "Coordenada de Contratacion " << i + 1 << " [x y]: ";
             try
             {
-                cin >> x >> y;
+                cin >> input;
+                x = stod(input);
+                cin >> input;
+                y = stod(input);
                 contrataciones.push_back(Point(pair<double,double>(x,y)));
                 break;
             }
@@ -502,9 +517,12 @@ int main(int argc, char const *argv[])
 
     // Solution_4_Voronoi a; a.solution(coordenadas);
     Solution_4_connection b;
+    int num = 1;
     for (Point nuevo : contrataciones)
     {
-        b.minDistance(centrales, nuevo);
+        cout << "Contratacion " << num ;
+        b.minDistance(centrales, nuevo); cout << "\n";
+        num++;
     }
 
     return 0;
